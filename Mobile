@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nike-aholic App</title>
+    
+<script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --nike-bg-dark: #111111; /* Nền Đen */
+            --nike-text-light: #eeeeee; /* Chữ Sáng */
+            --nike-card-dark: #1a1a1a; /* Thẻ nền Tối */
+            --nike-accent: #FF4500; /* Màu Đỏ Cam Rực Lửa/Năng lượng */
+            --nike-gray-text: #888888;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--nike-bg-dark);
+            color: var(--nike-text-light); 
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Chiều cao cố định cho màn hình ứng dụng di động */
+        .app-container {
+            max-width: 420px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--nike-bg-dark);
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+        /* Vùng cuộn nội dung */
+        .content-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-bottom: 80px; 
+            padding-top: 1rem;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 0 1rem;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Thanh Navigation */
+        .nav-bar {
+            background-color: var(--nike-bg-dark); 
+            border-top: 1px solid #333333;
+        }
+        .nav-icon {
+            color: var(--nike-gray-text);
+        }
+        .nav-icon.active {
+            color: var(--nike-accent);
+        }
+
+        /* Thẻ tối (Dark Card) - Nền cho thông báo và sản phẩm */
+        .dark-card {
+            background-color: var(--nike-card-dark);
+            color: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Floating Action Button cho Nike Bot */
+        .nike-bot-fab {
+            background-color: var(--nike-accent); 
+            color: white;
+        }
+        
+        .progress-bar-container {
+            height: 6px;
+            background-color: #333333; /* Nền tối của thanh */
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background-color: white; /* Màu trắng cho phần tiến độ */
+            transition: width 0.5s ease;
+        }
+        
+        /* LOGO NIKE LỚN TRONG HEADER */
+        .header-swoosh {
+            fill: currentColor;
+            width: 60px; /* Kích thước logo lớn hơn */
+            height: 60px;
+            color: var(--nike-accent); /* Màu Đỏ Cam Rực Lửa */
+        }
+        
+        /* LOGO NIKE trong thanh NAV */
+        .nav-nike-logo {
+            filter: grayscale(100%) brightness(0.7); /* Xám và hơi tối khi inactive */
+            opacity: 0.7;
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-icon.active .nav-nike-logo {
+            filter: grayscale(0%) brightness(1); /* Full màu khi active */
+            opacity: 1;
+            transform: scale(1.1); /* Hơi phóng to khi active */
+        }
+
+        .btn-accent {
+            background-color: var(--nike-accent);
+            color: black; /* Đổi thành Black để nổi bật hơn */
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+        .btn-dark {
+            background-color: #2a2a2a;
+            color: white;
+            transition: background-color 0.2s;
+        }
+        .btn-dark:hover {
+            background-color: #3a3a3a;
+        }
+        
+        /* Custom icons for social feed */
+        .social-icon {
+            font-size: 1.2rem;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Floating Nike Bot Button (Góc dưới phải) --><div id="nike-bot-fab" class="nike-bot-fab fixed bottom-[100px] right-4 w-14 h-14 rounded-full flex items-center justify-center text-sm font-bold shadow-xl z-50" onclick="setActiveTab('nike-bot')">
+            &#x1F916;
+        </div>
+
+        <!-- Vùng nội dung chính --><div id="content-area" class="content-area">
+
+            <!-- Tab 1: Home --><div id="home" class="tab-content active">
+                <header class="mb-6">
+                    <!-- Logo Nike lớn (Thay thế cho chữ Nike-aholic) --><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREYiIiR4YfS7Y1rTzGfL6zD1uqVmTgMdruIw&s" alt="Nike Logo" class="w-20 h-auto mb-2 object-contain" style="filter: brightness(1) drop-shadow(0 0 5px var(--nike-accent));">
+                    <p class="text-lg text-gray-500 mt-1">Hello, <span class="text-xl font-semibold text-white">An</span> 👋</p>
+                </header>
+                
+                <!-- Hero Banner Lớn - Sử dụng ảnh ngang bạn cung cấp --><div class="h-48 rounded-xl overflow-hidden mb-6 mx-2" style="background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20250429/pngtree-close-up-of-a-person-wearing-blue-nike-running-shoes-with-image_17220297.jpg'); background-size: cover; background-position: center; position: relative;">
+                    <div class="absolute bottom-4 left-4">
+                        <p class="text-3xl font-black text-white">JUST DO IT.</p>
+                        <button class="mt-2 text-xs bg-white text-black px-4 py-1.5 rounded-full font-bold hover:bg-gray-200">
+                            Khám phá ngay
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Thông báo Hoạt động & Gợi ý (Dark Cards) --><div class="dark-card flex items-center space-x-3">
+                    <span class="text-2xl text-[var(--nike-accent)]">👟</span>
+                    <p class="text-sm font-medium">Today you walked <span class="text-white font-bold">4.2 km</span> with your Nike Air Zoom!</p>
+                </div>
+
+                <div class="dark-card flex items-center space-x-3">
+                    <span class="text-2xl text-yellow-500">💡</span>
+                    <p class="text-sm font-medium">Today's tip: Your shoes have worn <span class="font-bold text-white">20 times</span> – time for a light cleaning</p>
+                </div>
+
+                <!-- Khu vực Gợi ý mua sắm (Sử dụng Dark Card với ảnh) --><h2 class="text-xl font-bold mt-6 mb-3 text-white">Gợi ý từ Nike Bot</h2>
+                <div class="dark-card">
+                    <div class="flex space-x-4 items-center">
+                        <!-- Thêm ảnh sản phẩm --><img src="https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/5eb3b87a-1ae9-4dae-a2f8-6427d71746c9/WMNS+AIR+MAX+90.png" alt="Air Max 90" class="rounded-lg object-cover w-24 h-24 border border-gray-700">
+                        <div class="flex-grow">
+                            <p class="font-bold text-lg">WMNS Air Max 90</p>
+                            <p class="text-sm text-gray-400 mb-2">Đệm khí tối đa cho chuyến đi bộ dài.</p>
+                            <span class="text-lg font-extrabold text-white">$130</span>
+                            <button class="float-right text-xs bg-gray-700 text-white px-3 py-1 rounded-full hover:bg-gray-600">
+                                Xem ngay
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: My Shoes --><div id="my-shoes" class="tab-content">
+                <header class="mb-4">
+                    <h1 class="text-3xl font-bold">My Shoes 👟</h1>
+                    <p class="text-sm text-gray-500 mt-1">Quản lý và chăm sóc bộ sưu tập của tôi.</p>
+                </header>
+
+                <!-- Thẻ giày nổi bật (AF1 Low) - Nổi bật như ảnh mockup --><div class="dark-card p-4 mb-4">
+                    <div class="flex flex-col items-center mb-4">
+                        <!-- Ảnh chính AF1 trắng --><img src="https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/4f37fca8-6bce-43e7-ad07-f57ae3c13142/AIR+FORCE+1+%2707.png" alt="Nike Air Force 1 Low" class="w-full h-auto object-cover mb-4 rounded-lg border border-gray-700 shadow-lg">
+                        <p class="font-bold text-xl text-white">Nike Air Force 1 '07</p>
+                    </div>
+                    
+                    <!-- Progress Bar (Trắng trên nền tối) --><p class="text-xs text-gray-400 mb-1">18/30 wears before recommended cleaning</p>
+                    <div class="progress-bar-container mb-4">
+                        <div class="progress-bar" style="width: 60%;"></div>
+                    </div>
+
+                    <!-- Action Buttons --><div class="flex justify-between space-x-2 text-xs">
+                        <button class="w-full py-2 rounded-lg btn-accent text-black font-semibold hover:opacity-90">Scan & Clean</button>
+                        <button class="w-full py-2 rounded-lg btn-dark text-white font-semibold">Comfort Check</button>
+                        <button class="w-full py-2 rounded-lg btn-dark text-white font-semibold">Return</button>
+                        <button class="w-full py-2 rounded-lg btn-dark text-white font-semibold">History</button>
+                    </div>
+                </div>
+
+                <h2 class="text-lg font-bold mt-4 mb-2 text-white">Bộ sưu tập</h2>
+                
+                <!-- Danh sách giày còn lại (có ảnh) --><div class="space-y-3">
+                    <!-- Giày 2 (Shox Ride 2) --><div class="dark-card flex items-center space-x-3 p-3">
+                        <img src="https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/012a91ce-8601-44df-bc76-e98718a414b3/NIKE+SHOX+RIDE+2.png" alt="Nike Shox Ride 2" class="rounded-lg object-cover w-16 h-16 border border-gray-700">
+                        <div class="flex-grow">
+                            <p class="font-bold text-base">Nike Shox Ride 2</p>
+                            <p class="text-xs text-gray-400">5/30 wears</p>
+                            <div class="progress-bar-container mt-1">
+                                <div class="progress-bar" style="width: 16%;"></div>
+                            </div>
+                        </div>
+                        <span class="text-xl text-gray-500">&gt;</span>
+                    </div>
+                    <!-- Giày 3 (Air Max TL 2.5) --><div class="dark-card flex items-center space-x-3 p-3">
+                        <img src="https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/5bd30c3e-63e8-4ac8-862a-ff141ab37e72/AIR+MAX+TL+2.5.png" alt="Air Max TL 2.5" class="rounded-lg object-cover w-16 h-16 border border-gray-700">
+                        <div class="flex-grow">
+                            <p class="font-bold text-base">Air Max TL 2.5</p>
+                            <p class="text-xs text-gray-400">25/30 wears</p>
+                            <div class="progress-bar-container mt-1">
+                                <div class="progress-bar" style="width: 83%;"></div>
+                            </div>
+                        </div>
+                        <span class="text-xl text-gray-500">&gt;</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Tab 3: Shop (E-commerce Style - Gần Nike.com) --><div id="shop" class="tab-content">
+                <header class="mb-4">
+                    <h1 class="text-3xl font-extrabold">Shop 🛍️</h1>
+                    <p class="text-sm text-gray-500 mt-1">Sản phẩm & Khuyến mãi độc quyền.</p>
+                </header>
+                
+                <div class="px-2">
+                    <!-- Banner lớn kiểu Nike.com --><div class="h-32 rounded-xl overflow-hidden mb-6" style="background-image: url('https://pos.nvncdn.com/be3294-43017/art/20230630_DCWkYM8r.jpeg?v=1688108526'); background-size: cover; background-position: center; position: relative; border: 2px solid var(--nike-accent);">
+                         <div class="absolute top-4 left-4">
+                            <p class="text-xl font-black text-white">SUMMER SALE 🔥</p>
+                            <p class="text-sm text-gray-300">Giảm tới 50% tất cả giày chạy bộ</p>
+                            <button class="mt-2 text-xs bg-white text-black px-4 py-1 rounded-full font-bold">
+                                Mua sắm ngay
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Section: Featured Sneakers (Giày nổi bật) --><h2 class="text-xl font-semibold mb-3 text-white">Featured Sneakers</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Product 1: Air Force 1 GTX --><div class="flex flex-col dark-card p-3 shadow-md transition duration-200 hover:scale-[1.02] cursor-pointer">
+                            <img src="https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/4cde9042-7bbf-4bc3-9870-2891c27e7888/AIR+FORCE+1+GTX.png" alt="Air Force 1 GTX" class="w-full rounded-lg object-cover mb-2 border border-gray-700">
+                            <p class="text-sm mt-1 font-medium text-gray-400">Air Force 1 GTX</p>
+                            <p class="text-lg font-bold text-white">$180</p>
+                            <div class="flex space-x-1 mt-2">
+                                <button class="flex-1 text-xs py-1.5 rounded-full btn-accent text-black font-bold">
+                                    Thêm vào giỏ
+                                </button>
+                                <button class="flex-1 text-xs py-1.5 rounded-full btn-dark text-white font-bold hover:bg-gray-700">
+                                    Thử AR
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Product 2: Nike React SFB Carbon --><div class="flex flex-col dark-card p-3 shadow-md transition duration-200 hover:scale-[1.02] cursor-pointer">
+                            <img src="https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/47614650-53ed-4316-96a2-5ef16d8badb0/NIKE+REACT+SFB+CARBON.png" alt="Nike React SFB Carbon" class="w-full rounded-lg object-cover mb-2 border border-gray-700">
+                            <p class="text-sm mt-1 font-medium text-gray-400">Nike React SFB Carbon</p>
+                            <p class="text-lg font-bold text-white">$220</p>
+                            <div class="flex space-x-1 mt-2">
+                                <button class="flex-1 text-xs py-1.5 rounded-full btn-accent text-black font-bold">
+                                    Thêm vào giỏ
+                                </button>
+                                <button class="flex-1 text-xs py-1.5 rounded-full btn-dark text-white font-bold hover:bg-gray-700">
+                                    Thử AR
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Product 3: Nike Shox R4 --><div class="flex flex-col dark-card p-3 shadow-md transition duration-200 hover:scale-[1.02] cursor-pointer">
+                            <img src="https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/8507bfd1-93ca-43dd-9e34-dd6c30afc7f1/NIKE+SHOX+R4.png" alt="Nike Shox R4" class="w-full rounded-lg object-cover mb-2 border border-gray-700">
+                            <p class="text-sm mt-1 font-medium text-gray-400">Nike Shox R4</p>
+                            <p class="text-lg font-bold text-white">$120</p>
+                            <div class="flex space-x-1 mt-2">
+                                <button class="flex-1 text-xs py-1.5 rounded-full btn-accent text-black font-bold">
+                                    Thêm vào giỏ
+                                </button>
+                                <button class="flex-1 text-xs py-1.5 rounded-full btn-dark text-white font-bold hover:bg-gray-700">
+                                    Thử AR
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Product 4: Nike Cortez LTR SE --><div class="flex flex-col dark-card p-3 shadow-md transition duration-200 hover:scale-[1.02] cursor-pointer">
+                            <img src="https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/bedb0bf3-8009-4e34-96a9-9fe186d5ccff/NIKE+CORTEZ+LTR+SE.png" alt="Nike Cortez LTR SE" class="w-full rounded-lg object-cover mb-2 border border-gray-700">
+                            <p class="text-sm mt-1 font-medium text-gray-400">Nike Cortez LTR SE</p>
+                            <p class="text-lg font-bold text-white">$90</p>
+                            <div class="flex space-x-1 mt-2">
+                                <button class="flex-1 text-xs py-1.5 rounded-full btn-accent text-black font-bold">
+                                    Thêm vào giỏ
+                                </button>
+                                <button class="flex-1 text-xs py-1.5 rounded-full btn-dark text-white font-bold hover:bg-gray-700">
+                                    Thử AR
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Nike By You section --><h2 class="text-xl font-semibold mt-6 mb-3 text-white">Nike By You</h2>
+                    <div class="flex space-x-4">
+                         <div class="dark-card text-center flex-1 p-3 transition duration-200 hover:bg-gray-800 cursor-pointer">
+                            <span class="text-3xl block text-purple-400">🎨</span>
+                            <p class="mt-1 font-bold text-sm">Custom Dunk</p>
+                             <button class="mt-2 text-xs py-1.5 w-full rounded-full btn-dark text-white font-bold hover:bg-gray-700">
+                                Thử AR
+                            </button>
+                        </div>
+                         <div class="dark-card text-center flex-1 p-3 transition duration-200 hover:bg-gray-800 cursor-pointer">
+                            <span class="text-3xl block text-green-400">🛠️</span>
+                            <p class="mt-1 font-bold text-sm">Custom Air Max</p>
+                             <button class="mt-2 text-xs py-1.5 w-full rounded-full btn-dark text-white font-bold hover:bg-gray-700">
+                                Thử AR
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AR Try-on & Loyalty Points --><!-- Đã tích hợp nút AR vào từng sản phẩm, có thể giữ cái này làm AR chung --><div class="flex space-x-4 mt-6">
+                        <div class="dark-card text-center flex-1 bg-gray-900 hover:bg-gray-800 transition duration-200 cursor-pointer">
+                            <span class="text-3xl block text-purple-400">📱</span>
+                            <p class="mt-1 font-bold text-sm">Thử AR chung</p>
+                        </div>
+                        <div class="dark-card text-center flex-1 bg-gray-900 hover:bg-gray-800 transition duration-200 cursor-pointer">
+                            <span class="text-3xl block text-yellow-400">&#x2B50;</span>
+                            <p class="mt-1 font-bold text-sm">Loyalty Points</p>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <!-- Tab 4: Community (Social Media Style - FB/X) --><div id="community" class="tab-content">
+                <header class="mb-4">
+                    <h1 class="text-3xl font-extrabold">Community 💬</h1>
+                    <p class="text-sm text-gray-500 mt-1">Kết nối, chia sẻ và quyên góp.</p>
+                </header>
+                
+                <div class="px-2">
+                    <!-- Community Sub-Navigation --><div class="flex space-x-2 border-b border-gray-800 mb-4 pb-2">
+                        <button id="community-exchange-btn" class="sub-nav-btn text-gray-500 text-sm font-bold px-4 py-1 rounded-full hover:bg-gray-800" data-target="exchange-hub">Exchange Hub</button>
+                        <button id="community-stories-btn" class="sub-nav-btn active bg-gray-700 text-white text-sm font-bold px-4 py-1 rounded-full" data-target="stories">Stories</button>
+                        <button id="community-donation-btn" class="sub-nav-btn text-gray-500 text-sm font-bold px-4 py-1 rounded-full hover:bg-gray-800" data-target="donation-events">Donation</button>
+                    </div>
+
+                    <!-- Nội dung Stories (Social Feed) --><div id="stories" class="community-sub-content active">
+                        <h2 class="text-xl font-semibold mb-3 text-white">Stories 📸</h2>
+                         <div class="dark-card p-4">
+                            <!-- Header Post --><div class="flex items-center mb-3">
+                                <img src="https://placehold.co/40x40/444/fff?text=NN" alt="User Avatar" class="rounded-full w-10 h-10 mr-3 border border-gray-600">
+                                <div>
+                                    <p class="font-bold text-white">Nguyễn Nam</p>
+                                    <p class="text-xs text-gray-500">@ChiyeuminhHa | 3 giờ trước</p>
+                                </div>
+                                <span class="ml-auto text-xl text-gray-500 cursor-pointer">...</span>
+                            </div>
+                            <!-- Ảnh Bài viết --><img src="blob:https://www.messenger.com/020b8adc-0cd8-4ffe-b067-18a47ff5f817" alt="Post Image" class="w-full rounded-lg object-cover mb-3 border border-gray-700">
+                            <!-- Nội dung & Tương tác --><p class="text-sm mb-3">Mùa đông giá rét cùng đôi giày Nike Fullforce</p>
+                            <div class="flex items-center space-x-4 text-gray-500 text-sm border-t border-gray-800 pt-3">
+                                <span class="space-x-4">
+                                    <div class="flex items-center space-x-1 cursor-pointer hover:text-red-500">
+                                        <span class="social-icon text-red-500">❤️</span>
+                                        <span>150</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 cursor-pointer hover:text-white">
+                                        <span class="social-icon">💬</span>
+                                        <span>32</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1 cursor-pointer hover:text-green-500">
+                                        <span class="social-icon">🔁</span>
+                                        <span>5</span>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Nội dung Exchange Hub --><div id="exchange-hub" class="community-sub-content hidden">
+                        <h2 class="text-xl font-semibold mb-3 text-white">Exchange Hub 🤝</h2>
+                        <div class="dark-card p-4">
+                            <div class="flex items-center mb-3">
+                                <img src="https://placehold.co/40x40/333/fff?text=H" alt="User Avatar" class="rounded-full w-10 h-10 mr-3">
+                                <div>
+                                    <p class="font-bold">Huy Hoang</p>
+                                    <p class="text-xs text-gray-400">TP. Hồ Chí Minh | Size 42</p>
+                                </div>
+                                <button class="ml-auto text-xs btn-accent px-3 py-1 rounded-full text-black">
+                                    Trao đổi
+                                </button>
+                            </div>
+                            <img src="https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/bedb0bf3-8009-4e34-96a9-9fe186d5ccff/NIKE+CORTEZ+LTR+SE.png" alt="Item Image" class="w-full rounded-lg object-cover mb-3 border border-gray-700">
+                            <p class="text-lg font-bold text-white">Bán nhanh: AF1 Custom Size 42</p>
+                            <p class="text-sm text-gray-400 mt-1">
+                                Số lần đi: 12 lần | Giá bán: 80 USD
+                            </p>
+                        </div>
+                        <button class="w-full mt-4 py-2 text-sm btn-accent rounded-lg text-black">
+                            + Đăng tin mới
+                        </button>
+                    </div>
+
+                    <!-- Nội dung Donation Events --><div id="donation-events" class="community-sub-content hidden">
+                        <h2 class="text-xl font-semibold mb-3 text-white">Donation Events 💚</h2>
+                        
+                        <!-- Event Card --><div class="dark-card bg-green-900/50 border border-green-700">
+                            <p class="text-xs font-bold text-green-400 mb-1">ĐANG DIỄN RA</p>
+                            <img src="https://placehold.co/350x150/14532D/fff?text=Quyen+Gop+Mien+Bac" alt="Donation Image" class="w-full rounded-lg object-cover mb-3">
+                            <p class="text-lg font-bold">Sức Mạnh Đôi Giày Cũ (Miền Bắc)</p>
+                            <div class="flex justify-between items-center mt-4 border-t border-green-800 pt-3">
+                                <p class="text-sm font-bold text-green-400">1 đôi giày = 50 Loyalty Points</p>
+                                <button class="bg-white text-black text-sm font-bold px-4 py-2 rounded-lg transition duration-200">
+                                    Đăng ký
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 5: Nike Bot --><div id="nike-bot" class="tab-content">
+                <header class="mb-4">
+                    <h1 class="text-3xl font-extrabold">Nike Bot 🤖</h1>
+                    <p class="text-sm text-gray-500 mt-1">Trợ lý AI toàn năng của bạn.</p>
+                </header>
+                
+                <div class="px-2 pb-6">
+                    <!-- Chat Window Mockup --><div class="h-[60vh] flex flex-col justify-end space-y-4">
+                        <!-- Message 1 (Bot) --><div class="flex">
+                            <div class="dark-card p-3 rounded-xl rounded-bl-none max-w-[80%]">
+                                <p class="text-sm">Xin chào! Tôi là Nike Bot, trợ lý AI của bạn. Hãy hỏi tôi bất cứ điều gì về giày, bảo hành, hoặc khuyến mãi!</p>
+                            </div>
+                        </div>
+                        <!-- Message 2 (User) - Nền accent --><div class="flex justify-end">
+                            <div class="btn-accent text-black p-3 rounded-xl rounded-br-none max-w-[80%] shadow-md">
+                                <p class="text-sm">Cách vệ sinh giày da?</p>
+                            </div>
+                        </div>
+                        <!-- Message 3 (Bot with quick action) --><div class="flex">
+                            <div class="dark-card p-3 rounded-xl rounded-bl-none max-w-[80%]">
+                                <p class="text-sm">Tôi có thể đưa bạn đến mục <span class="font-bold text-white">Scan & Clean</span> để xem video hướng dẫn chi tiết không?</p>
+                                <button class="mt-2 text-xs btn-accent text-black px-3 py-1 rounded-full" onclick="setActiveTab('my-shoes'); showCommunitySubContent('scan-clean')">
+                                    Mở Scan & Clean
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Input Area --><div class="flex items-center border-t border-gray-800 pt-4 mt-4">
+                        <button class="text-xl text-gray-500 mr-2 hover:text-[var(--nike-accent)] transition duration-200">
+                            📎
+                        </button>
+                        <input type="text" placeholder="Nhập câu hỏi hoặc chọn Voice Chat..." class="flex-grow bg-gray-800 text-white p-3 rounded-full focus:outline-none focus:ring-1 focus:ring-[var(--nike-accent)] placeholder-gray-500">
+                        <button class="text-2xl text-[var(--nike-accent)] ml-2 bg-[var(--nike-accent)]/10 p-2 rounded-full hover:bg-[var(--nike-accent)]/20 transition duration-200">
+                            🎤
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Thanh điều hướng dưới cùng (Navigation Bar) --><nav class="nav-bar fixed bottom-0 w-full max-w-[420px] shadow-2xl z-40">
+            <div class="flex justify-around items-center h-16">
+                <!-- Home (Logo Nike) --><div id="nav-home" class="nav-icon active flex flex-col items-center" data-tab="home" onclick="setActiveTab('home')">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREYiIiR4YfS7Y1rTzGfL6zD1uqVmTgMdruIw&s" alt="Nike Logo" class="w-6 h-6 object-contain nav-nike-logo">
+                    <span class="nav-text">Home</span>
+                </div>
+                <!-- My Shoes --><div id="nav-my-shoes" class="nav-icon flex flex-col items-center" data-tab="my-shoes" onclick="setActiveTab('my-shoes')">
+                    &#x1F45F;
+                    <span class="nav-text">My Shoes</span>
+                </div>
+                <!-- Shop --><div id="nav-shop" class="nav-icon flex flex-col items-center" data-tab="shop" onclick="setActiveTab('shop')">
+                    &#x1F6CD;
+                    <span class="nav-text">Shop</span>
+                </div>
+                <!-- Community --><div id="nav-community" class="nav-icon flex flex-col items-center" data-tab="community" onclick="setActiveTab('community')">
+                    &#x1F4AC;
+                    <span class="nav-text">Community</span>
+                </div>
+                <!-- Nike Bot --><div id="nav-nike-bot" class="nav-icon flex flex-col items-center" data-tab="nike-bot" onclick="setActiveTab('nike-bot')">
+                    &#x1F916;
+                    <span class="nav-text">Nike Bot</span>
+                </div>
+            </div>
+        </nav>
+
+    </div>
+
+    <script>
+        // Hàm chuyển đổi tab
+        function setActiveTab(tabId) {
+            // Ẩn tất cả nội dung tab
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Gỡ active khỏi tất cả icon nav
+            document.querySelectorAll('.nav-icon').forEach(icon => {
+                icon.classList.remove('active');
+            });
+            
+            // Ẩn/Hiện FAB (Ẩn nếu ở tab Nike Bot)
+            const fab = document.getElementById('nike-bot-fab');
+            if (tabId === 'nike-bot') {
+                fab.classList.add('hidden');
+            } else {
+                fab.classList.remove('hidden');
+            }
+
+
+            // Hiển thị nội dung tab được chọn
+            const targetContent = document.getElementById(tabId);
+            if (targetContent) {
+                targetContent.classList.add('active');
+                // Cuộn về đầu trang mới
+                document.getElementById('content-area').scrollTop = 0;
+            }
+
+            // Đặt active cho icon nav tương ứng
+            const targetNav = document.querySelector(`.nav-icon[data-tab="${tabId}"]`);
+            if (targetNav) {
+                targetNav.classList.add('active');
+            }
+            
+            // Đảm bảo tab Community luôn mở sub-content Stories khi chuyển sang
+            if (tabId === 'community') {
+                // Mở mặc định Stories
+                showCommunitySubContent('stories');
+            }
+        }
+        
+        // Hàm chuyển đổi Sub-Content trong Community Tab
+        function showCommunitySubContent(subId) {
+            // Ẩn tất cả sub-content
+            document.querySelectorAll('.community-sub-content').forEach(content => {
+                content.classList.add('hidden');
+                content.classList.remove('active');
+            });
+
+            // Gỡ active khỏi tất cả sub-nav buttons
+            document.querySelectorAll('.sub-nav-btn').forEach(btn => {
+                btn.classList.remove('bg-gray-700', 'text-white');
+                btn.classList.add('text-gray-500', 'hover:bg-gray-800');
+            });
+            
+            // Hiển thị sub-content được chọn
+            const targetSubContent = document.getElementById(subId);
+            if (targetSubContent) {
+                targetSubContent.classList.remove('hidden');
+                targetSubContent.classList.add('active');
+            }
+
+            // Đặt active cho button tương ứng
+            const targetBtn = document.querySelector(`.sub-nav-btn[data-target="${subId}"]`);
+            if (targetBtn) {
+                targetBtn.classList.add('bg-gray-700', 'text-white');
+                targetBtn.classList.remove('text-gray-500', 'hover:bg-gray-800');
+            }
+        }
+
+        // Listener cho Sub-Navigation Buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.sub-nav-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const targetId = e.target.getAttribute('data-target');
+                    showCommunitySubContent(targetId);
+                });
+            });
+            
+            // Khởi tạo tab mặc định
+            setActiveTab('home'); 
+        });
+    </script>
+</body>
+</html>
